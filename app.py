@@ -42,31 +42,36 @@ def register_user(username, password):
         return True
     except sqlite3.IntegrityError:
         return False
+    
+# Rota para exibir a página principal com os formulários
+@app.route('/')
+def index():
+    return render_template('index.html')
 
 # Rota principal com login e cadastro
-@app.route('/', methods=['GET', 'POST'])
-def home():
+@app.route('/login', methods=['GET', 'POST'])
+def login():
     if request.method == 'POST':
-        # Verifica qual formulário foi enviado
-        if 'username' in request.form and 'password' in request.form:
-            username = request.form['username']
-            password = request.form['password']
+        username = request.form['username']
+        password = request.form['password']
 
-            if verify_user(username, password):
-                return redirect(url_for('dashboard'))
-            else:
-                return "Usuário ou senha inválidos", 401
-
-        elif 'username2' in request.form and 'password2' in request.form:
-            username = request.form['username2']
-            password = request.form['password2']
-
-            if register_user(username, password):
-                return redirect(url_for('home'))
-            else:
-                return "Usuário já existe", 400
+        if verify_user(username, password):
+            return redirect(url_for('dashboard'))
+        else:
+            return "Usuário ou senha inválidos", 401
 
     return render_template('index.html')
+
+# Rota para cadastro
+@app.route('/cadastro', methods=['POST'])
+def cadastro():
+    username = request.form['username']
+    password = request.form['password']
+
+    if register_user(username, password):
+        return redirect(url_for('index'))
+    else:
+        return "Usuário já existe", 400
 
 @app.route('/dashboard')
 def dashboard():
